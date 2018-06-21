@@ -31,7 +31,7 @@
 
 - name: Add docker apt source
   apt_repository:
-    repo: "deb [arch=amd64] https://download.docker.com/linux/{{ ansible_lsb.id|lower }} {{ ansible_lsb.codename }} stable"
+    repo: "deb [arch=amd64] https://download.docker.com/linux/{{ ansible_lsb.id|lower }} {{ ansible_lsb.codename }} {{ docker_branch }}"
     filename: docker
   become: yes
   register: add_docker_apt_source
@@ -58,10 +58,27 @@
     - "docker-engine"
     - "docker"
 
-- name: Install docker community edition
+- name: Install docker community edition version {{ docker_version }}
   apt:
-    name: docker-ce
+    name: docker-ce={{ docker_version }}{{ ansible_lsb.id|lower }}
     state: present
     force: yes
+  when: not ((docker_version is undefined) or (docker_version is none) or (docker_version | trim == ''))
+  become: yes
+  register: install_version
+  tags: ["docker","apt"]
+  notify: 
+    - systemctl daemon-reload
+    - restart docker
+
+- name: Install docker community edition latest
+  apt:
+    name: docker-ce
+    state: latest
+    force: yes
+  when: not install_version.changed 
   become: yes
   tags: ["docker","apt"]
+  notify: 
+    - systemctl daemon-reload
+    - restart docker
