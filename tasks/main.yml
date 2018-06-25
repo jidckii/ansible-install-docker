@@ -77,7 +77,7 @@
   tags: ["docker","service"]
 
 - name: Adding existing user '{{ ansible_user }}' to group docker
-  user: 
+  user:
     name: '{{ ansible_user }}'
     groups: docker
     append: yes

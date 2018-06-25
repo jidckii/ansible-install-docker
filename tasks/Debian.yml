@@ -67,7 +67,7 @@
   become: yes
   register: install_version
   tags: ["docker","apt"]
-  notify: 
+  notify:
     - systemctl daemon-reload
     - restart docker
 
@@ -76,9 +76,9 @@
     name: docker-ce
     state: latest
     force: yes
-  when: not install_version.changed 
+  when: not install_version.changed
   become: yes
   tags: ["docker","apt"]
-  notify: 
+  notify:
     - systemctl daemon-reload
     - restart docker
